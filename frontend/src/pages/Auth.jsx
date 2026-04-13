@@ -85,7 +85,7 @@ export const ForgotPasswordPage = ({ onNavigate }) => (
         <Input label="Email Address" icon={Mail} type="email" placeholder="student@university.edu" />
         <Button className="w-full py-5 shadow-xl shadow-primary/10 mb-8 mt-4">Reset Password</Button>
         <p className="text-center text-xs text-secondary">
-           Remembered your password? <button onClick={() => onNavigate('/login')} className="text-primary font-bold hover:underline">Return to Login</button>
+           Remember your password? <button onClick={() => onNavigate('/login')} className="text-primary font-bold hover:underline">Return to Login</button>
         </p>
      </form>
   </Layout>
