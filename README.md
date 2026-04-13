@@ -34,13 +34,13 @@ Welcome to the modernized React frontend for the FOSSEE Workshop Portal. This re
 ## 📸 Visuals
 
 ### Desktop Views
-![Home](./screenshot/home.jpeg)
-![Stats](./screenshot/stats.jpeg)
-![Login](./screenshot/login.jpeg)
+![Home](./Screenshot/home.jpeg)
+![Stats](./Screenshot/stats.jpeg)
+![Login](./Screenshot/login.jpeg)
 
 ### Mobile Views
-![Mobile 1](./screenshot/mobile1.jpeg)
-![Mobile 2](./screenshot/mobile2.jpeg)
+![Mobile 1](./Screenshot/mobile1.jpeg)
+![Mobile 2](./Screenshot/mobile2.jpeg)
 
 ---
 
