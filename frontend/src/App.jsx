@@ -15,14 +15,12 @@ function App() {
   const [workshops, setWorkshops] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Sync state with browser navigation
   useEffect(() => {
     const handlePopState = () => setCurrentPath(window.location.pathname);
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Fetch Workshops
   useEffect(() => {
     fetch('/workshop/api/workshops/')
       .then(res => res.json())
@@ -38,7 +36,6 @@ function App() {
 
   const navigate = (path) => {
     if (path.startsWith('/workshop/login') || path.startsWith('/workshop/logout')) {
-      window.location.href = path; // Standard Django redirect
       return;
     }
     window.history.pushState({}, '', path);
@@ -56,7 +53,6 @@ function App() {
       </div>
     );
 
-    // Basic Routing Logic
     if (currentPath === '/' || currentPath === '/workshop/') return <LandingPage onNavigate={navigate} workshops={workshops} />;
     
     if (currentPath === '/workshops' || currentPath === '/workshop/types/') 

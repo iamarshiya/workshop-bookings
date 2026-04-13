@@ -1,23 +1,88 @@
-# FOSSEE Workshop Booking - Modernization Project
+# 🎨 FOSSEE Workshop Portal: UI/UX Modernization
 
-This project transforms the legacy Django portal into a high-performance, mobile-first Single Page Application (SPA) using React.
+## 📌 Overview
+Welcome to the modernized React frontend for the FOSSEE Workshop Portal. This repository entirely replaces the legacy Bootstrap 4 Django templates with a blazing fast, strictly accessible, and mobile-first single-page application built on React, Tailwind CSS v4, and Vite.
 
-## 📱 Mobile-First Design Principles
+---
 
-We have adopted five specific design principles to optimize the platform for students on mobile devices:
+## Key Features
 
-1. **Aesthetic Minimalism (Signal vs. Noise)**: We removed the cluttered table layouts and multi-level headers. By using white space and a clean color palette, we ensure students focus on one thing: discovering their next workshop.
-2. **Visual Hierarchy (Progressive Disclosure)**: On small screens, we prioritize the primary call-to-action ("Browse Workshops") while keeping secondary info (stats, about) clearly separated using elevated cards.
-3. **Affordance & Tap Targets**: All interactive elements (buttons, bottom tabs) have a minimum height of 56px to ensure "fat-finger" friendliness and prevent accidental mis-clicks.
-4. **Consistency (Mental Models)**: We use a persistent bottom navigation bar (Home, Stats, Events, Account), which mimics the UI of native apps like LinkedIn or Coursera, significantly reducing the learning curve for students.
-5. **Glassmorphism & Depth**: Subtle shadows and backdrop blurs are used not just for aesthetics, but to provide depth clues. It helps students distinguish between the primary content layer and overlay elements like navigation.
+### 🏠 Modern UI/UX
+* **Hero Section**: High-impact landing with clear CTAs to guide users.
+* **Authentication**: Split-screen login/signup with a clean, centered layout.
+* **Modern Styling**: Uses Tailwind CSS v4 for a premium Look & Feel.
+* **Mobile First**: Built using CSS Grid and Flexbox to ensure it works perfectly on smartphones.
 
-## 🛠 Tech Stack
-- **Frontend**: React 18, Vite (Fast Load Times)
-- **Backend**: Django 3 (Python 3.12)
-- **Design**: Custom CSS-in-JS design system
+### 📊 Dashboard & Stats
+* **Data Visualization**: Replaced old tables with a clean, card-based stats dashboard.
+* **Readability**: Improved typography and spacing for better scannability.
 
-## 🚀 Key Improvements
-- **Performance**: Reduced page load time by moving to a client-side routing model.
-- **Responsiveness**: Replaced legacy data tables with a flexible card-based feed system.
-- **Accessibility**: High contrast text and aria-labels for mobile screen readers.
+### 🔍 Search & SEO
+* **Dynamic Meta Tags**: Uses `react-helmet-async` for page-specific titles and descriptions.
+* **Social Sharing**: Standardized Open Graph and Twitter Card tags for better link previews.
+* **Clean Code**: Semantic HTML5 structure for better accessibility and ranking.
+
+---
+
+## Technical Stack
+* **Frontend**: React 18, Vite, Tailwind CSS v4.
+* **Backend**: Django 3.
+* **Animations**: Framer Motion for smooth transitions.
+
+---
+
+## 📸 Visuals
+
+### Desktop Views
+![Home](./screenshot/home.jpeg)
+![Stats](./screenshot/stats.jpeg)
+![Login](./screenshot/login.jpeg)
+
+### Mobile Views
+![Mobile 1](./screenshot/mobile1.jpeg)
+![Mobile 2](./screenshot/mobile2.jpeg)
+
+---
+
+## 🛠 Setup Instructions
+
+This project is divided into two distinct applications: a Django Backend API and a React Frontend.
+
+### 1️⃣ Backend Setup (Django)
+Navigate to the root directory of the project.
+
+```bash
+# Create and activate a virtual environment 
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Apply database migrations
+python manage.py migrate
+
+# Start the development server
+python manage.py runserver
+```
+
+### 2️⃣ Frontend Setup (React + Vite)
+Open a new terminal and navigate to the `frontend` folder.
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+---
+
+## 👤 Student Details
+
+- **Name**: [Arshiya Attar]
+- **Task**: Python / UI/UX Screening Task
+- **Organization**: MIT Academy of Engineering,Pune

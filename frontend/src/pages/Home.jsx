@@ -10,7 +10,6 @@ export const LandingPage = ({ onNavigate, workshops = [] }) => {
     { title: 'Open Source', count: 15, img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=400' },
   ];
 
-  // Use real workshops from Django, fallback to placeholders if needed
   const displayWorkshops = workshops.length > 0 ? workshops.slice(0, 3).map((w, idx) => ({
     id: w.id,
     title: w.title,
@@ -26,7 +25,6 @@ export const LandingPage = ({ onNavigate, workshops = [] }) => {
 
   return (
     <div className="pt-24">
-      {/* Hero Section */}
       <section className="min-h-[85vh] flex items-center relative overflow-hidden bg-[#F2F0ED]">
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="z-10 fade-in">
@@ -55,11 +53,9 @@ export const LandingPage = ({ onNavigate, workshops = [] }) => {
             </div>
           </div>
         </div>
-        {/* Subtle background text */}
         <div className="absolute -bottom-20 -right-20 text-[20vw] font-serif font-black text-black/[0.02] pointer-events-none uppercase">FOSSEE</div>
       </section>
 
-      {/* Categories */}
       <Section title="Learning Categories" subtitle="Thematic areas curated for targeted skill development.">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((cat) => (
@@ -75,7 +71,6 @@ export const LandingPage = ({ onNavigate, workshops = [] }) => {
         </div>
       </Section>
 
-      {/* Featured Workshops */}
       <section className="bg-white py-24">
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-end mb-16">
@@ -111,7 +106,6 @@ export const LandingPage = ({ onNavigate, workshops = [] }) => {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="py-24 bg-[#EAE8E4]">
         <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
           {[
@@ -129,7 +123,6 @@ export const LandingPage = ({ onNavigate, workshops = [] }) => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-32 relative overflow-hidden">
         <div className="container mx-auto px-6 text-center relative z-10">
           <h2 className="font-serif text-5xl md:text-7xl mb-10 leading-[1.1] tracking-tight">Ready to begin your <br /><span className="italic">learning</span> journey?</h2>

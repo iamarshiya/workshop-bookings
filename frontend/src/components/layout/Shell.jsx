@@ -24,7 +24,6 @@ export const Navbar = ({ onNavigate, currentPath }) => {
           FOSSEE<span className="text-accent">.</span>
         </a>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex gap-10 items-center">
           {links.map((link) => (
             <a key={link.name} href={link.path} onClick={(e) => { e.preventDefault(); onNavigate(link.path); }} className={`nav-link ${currentPath === link.path ? 'text-primary' : ''}`}>
@@ -39,13 +38,11 @@ export const Navbar = ({ onNavigate, currentPath }) => {
           </div>
         </div>
 
-        {/* Mobile Trigger */}
         <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-xl p-8 flex flex-col gap-6 fade-in">
           {links.map((link) => (

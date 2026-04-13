@@ -24,7 +24,6 @@
 
 @layer components {
   .btn-premium {
-    /* Tailwind 4 uses slash syntax for opacity */
     @apply px-8 py-3 bg-primary text-white rounded-full font-medium transition-all duration-300 hover:bg-primary/90 active:scale-95;
   }
   
@@ -33,7 +32,6 @@
   }
 
   .glass-card {
-    /* Tailwind 4 uses slash syntax for opacity */
     @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl;
   }
 
