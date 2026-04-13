@@ -57,13 +57,84 @@ def get_landing_page(user):
 # View functions
 
 def index(request):
-    """Landing Page : Redirect to login page if not logged in
-                      Redirect to respective landing page according to position"""
-    user = request.user
-    if user.is_authenticated and is_email_checked(user):
-        return redirect(get_landing_page(user))
+    """Serve the React Frontend via Django template with User Context"""
+    user_data = None
+    if request.user.is_authenticated:
+        user_data = {
+            'username': request.user.username,
+            'full_name': request.user.get_full_name() or request.user.username,
+            'role': 'instructor' if is_instructor(request.user) else 'coordinator',
+            'is_authenticated': True
+        }
+    return render(request, 'workshop_app/index.html', {'user_json': user_data})
 
-    return redirect(reverse('workshop_app:login'))
+
+def workshop_list_api(request):
+    """API endpoint for workshop list"""
+    try:
+        workshops = WorkshopType.objects.all().order_by('name')
+        data = []
+        for w in workshops:
+            data.append({
+                'id': w.id,
+                'title': w.name,
+                'description': (w.description[:100] + '...') if w.description else 'No description available.',
+                'duration': w.duration,
+                'icon': '📚'
+            })
+        return JsonResponse({'workshops': data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def user_stats_api(request):
+    """API endpoint for dashboard statistics"""
+    user = request.user
+    if is_instructor(user):
+        # Stats for instructor
+        workshops_count = Workshop.objects.filter(instructor=user).count()
+        completed = Workshop.objects.filter(instructor=user, date__lt=timezone.now().date()).count()
+        upcoming = Workshop.objects.filter(instructor=user, date__gte=timezone.now().date()).count()
+    else:
+        # Stats for coordinator
+        workshops_count = Workshop.objects.filter(coordinator=user).count()
+        completed = Workshop.objects.filter(coordinator=user, date__lt=timezone.now().date()).count()
+        upcoming = Workshop.objects.filter(coordinator=user, date__gte=timezone.now().date()).count()
+
+    return JsonResponse({
+        'registered': workshops_count,
+        'completed': completed,
+        'upcoming': upcoming,
+        'saved': 0 # Placeholder for now
+    })
+
+
+def workshop_detail_json_api(request, workshop_id):
+    """API endpoint for full workshop details"""
+    try:
+        w = WorkshopType.objects.get(id=workshop_id)
+        return JsonResponse({
+            'id': w.id,
+            'title': w.name,
+            'description': w.description,
+            'price': 'Free',
+            'seats': 50,
+            'enrolled': 0,
+            'date': 'Coming Soon',
+            'instructor': {
+                'name': 'FOSSEE Expert',
+                'role': 'IIT Bombay',
+                'img': 'https://via.placeholder.com/150'
+            },
+            'agenda': [
+                {'time': '10:00 AM', 'event': 'Session 1'},
+                {'time': '02:00 PM', 'event': 'Hands-on'}
+            ],
+            'prerequisites': ['Basic technical skills']
+        })
+    except WorkshopType.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
 
 
 # User views

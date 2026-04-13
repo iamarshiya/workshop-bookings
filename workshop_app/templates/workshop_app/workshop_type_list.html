@@ -1,85 +1,64 @@
 {% extends 'workshop_app/base.html' %}
 {% load custom_filters %}
-{% block title %}
-	View List of available Workshops
-{% endblock %}
+
+{% block title %} Workshop Catalog {% endblock %}
 
 {% block content %}
-    <div class="container">
-    <h2 class="text-center">Workshop Types</h2>
-    <br>
-    {% if request.user|has_group:"instructor" %}
-        <a href="{% url 'workshop_app:add_workshop_type' %}">
-        <button class="btn btn-md btn-primary float-right mb-3 mx-4">Add Workshop Type</button>
-        </a>
-        <br>
-    {% endif %}
-	<div class="container">
-		<table class="table table-hover">
-		  <thead>
-		    <tr>
-		      <th>Sr No</th>
-		      <th>Workshop Name</th>
-		      <th>Workshop Duration (Days)</th>
-		      <th>Action</th>
-		    </tr>
-		  </thead>
+<div class="reveal" style="padding: 40px 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div>
+            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;">Explore Workshops</h2>
+            <p style="color: var(--text-muted);">Master state-of-the-art open source technologies with IIT Bombay.</p>
+        </div>
+        {% if request.user|has_group:"instructor" %}
+            <a href="{% url 'workshop_app:add_workshop_type' %}" class="btn-primary" style="text-decoration: none;">
+                + Add Workshop
+            </a>
+        {% endif %}
+    </div>
 
-		{% for w in workshop_type %}
-		  <tbody>
-		    <tr  >
-		      <td scope="row" id="{{ forloop.counter }}">{{ forloop.counter }}</td>
-		      <td>{{ w.name }}</td>
-		      <td>{{ w.duration }}</td>
-		      <td><a href="{% url 'workshop_app:workshop_type_details' w.id %}" class="btn btn-outline-info" class="accordion-toggle" >View Workshop Details</a></td>
-		    </tr>
-		  </tbody>
-		 {% endfor %}
-		</table>
-	</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 32px;">
+        {% for w in workshop_type %}
+        <div class="glass-card" style="padding: 0; overflow: hidden; height: 100%; display: flex; flex-direction: column;">
+            <div style="height: 160px; background: rgba(37, 99, 235, 0.03); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                📚
+            </div>
+            <div style="padding: 24px; flex: 1; display: flex; flex-direction: column;">
+                <div style="font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 8px;">
+                    {{ w.duration }} Days Program
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">
+                    {{ w.name }}
+                </h3>
+                <div style="margin-top: auto; padding-top: 24px;">
+                    <a href="{% url 'workshop_app:workshop_type_details' w.id %}" class="btn-primary" style="width: 100%; text-decoration: none; text-align: center; display: block;">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 80px; color: var(--text-muted);">
+            No workshops are currently available. Check back soon!
+        </div>
+        {% endfor %}
+    </div>
 
-	    <!-- The Modal -->
-	    <div id="mailModal" class="modal">
+    <!-- Pagination -->
+    <div style="margin-top: 60px; display: flex; justify-content: center;">
+        <nav style="display: flex; gap: 8px; align-items: center;">
+            {% if workshop_type.has_previous %}
+                <a href="?page={{ workshop_type.previous_page_number }}" class="glass-card" style="padding: 8px 16px; text-decoration: none; font-size: 0.9rem;">Previous</a>
+            {% endif %}
+            
+            <span class="glass-card" style="padding: 8px 16px; font-weight: 700; background: var(--primary) !important; color: white !important;">
+                {{ workshop_type.number }} / {{ workshop_type.paginator.num_pages }}
+            </span>
 
-	    <!-- Modal content -->
-	    <div class="modal-content">
-		<span class="close">&times;</span>
-		<p>Separate Multiple Email Id's using <strong> comma (,)</strong></p>
-		<form action="{{URL_ROOT}}/share_details/" method="POST">
-		  {% csrf_token %}
-		    <label > Email: </label>
-		    <input name="email" type='email' multiple>
-		    <input type='submit'>
-		</form>
-	    </div>
-	    </div>
-
-<!-- Page Navigation -->
-	<div class="container">
-
-		<div class="Page-Nav" align="center">
-		<nav aria-label="Page navigation">
-		 	<ul class="pagination pagination-sm">
-			  	<li class="page-item">
-			      {% if workshoptype.has_previous %}
-					<a class="page-link" tabindex="-1" 
-							href="?page={{ workshop_type.previous_page_number }}">Previous</a>
-				{% endif %}
-			    </li>
-			    <li class="page-item">
-			    <span class="current">
-				Page {{ workshop_type.number }} of {{ workshop_type.paginator.num_pages }}
-					</span>
-				</li>
-			    <li class="page-item">
-			    {% if workshop_type.has_next %}
-					<a class="page-link" href="?page={{ workshop_type.next_page_number }}">Next
-					</a>
-				{% endif %}
-			    </li>
-		  	</ul>
-		</nav>
-		</div>
-	</div>
+            {% if workshop_type.has_next %}
+                <a href="?page={{ workshop_type.next_page_number }}" class="glass-card" style="padding: 8px 16px; text-decoration: none; font-size: 0.9rem;">Next</a>
+            {% endif %}
+        </nav>
+    </div>
 </div>
 {% endblock %}

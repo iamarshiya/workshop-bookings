@@ -14,12 +14,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
+from django.urls import path
 from workshop_app import views
 
 app_name = "workshop_app"
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    path('api/workshops/', views.workshop_list_api, name='workshop_list_api'),
+    path('api/stats/', views.user_stats_api, name='user_stats_api'),
+    path('api/workshop/<int:workshop_id>/', views.workshop_detail_json_api, name='workshop_detail_json_api'),
     url(r'^register/$', views.user_register, name="register"),
     url(r'^activate_user/(?P<key>.+)$', views.activate_user),
     url(r'^activate_user/$', views.activate_user),

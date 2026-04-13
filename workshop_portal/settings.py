@@ -66,7 +66,7 @@ ROOT_URLCONF = 'workshop_portal.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['workshop_app/templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'workshop_app', 'templates'), os.path.join(BASE_DIR, 'frontend', 'dist')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,7 +132,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = 'workshop_app/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'workshop_app', 'static_root')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend', 'dist'),
+]
 
 LOGIN_URL = '/workshop/login/'
 
@@ -164,7 +167,7 @@ SHOW_WORKSHOP_STATS = True
 # Create a CMS page as a home page and give the page title here
 HOME_PAGE_TITLE = "home-page-title"
 
-LOGIN_REDIRECT_URL = '/workshop/login'
+LOGIN_REDIRECT_URL = '/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_AGE = 3600

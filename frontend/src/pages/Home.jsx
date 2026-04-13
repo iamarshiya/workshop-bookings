@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Star, Clock, Users, BookOpen } from 'lucide-react';
 import { Button, Card, Section } from '../components/ui/Base';
 
-export const LandingPage = ({ onNavigate }) => {
+export const LandingPage = ({ onNavigate, workshops = [] }) => {
   const categories = [
     { title: 'Programming', count: 12, img: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=400' },
     { title: 'Data Science', count: 8, img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400' },
@@ -10,10 +10,18 @@ export const LandingPage = ({ onNavigate }) => {
     { title: 'Open Source', count: 15, img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=400' },
   ];
 
-  const workshops = [
-    { id: 1, title: 'Mastering Python for Data Science', instructor: 'Dr. Sarah Chen', level: 'Intermediate', price: 'Free', date: 'Oct 15' },
-    { id: 2, title: 'Embedded Systems with Arduino', instructor: 'Kevin Miller', level: 'Beginner', price: 'Free', date: 'Oct 18' },
-    { id: 3, title: 'Cloud-Native App Development', instructor: 'Elena Rodriguez', level: 'Advanced', price: 'Free', date: 'Oct 22' },
+  // Use real workshops from Django, fallback to placeholders if needed
+  const displayWorkshops = workshops.length > 0 ? workshops.slice(0, 3).map((w, idx) => ({
+    id: w.id,
+    title: w.title,
+    instructor: 'FOSSEE Expert',
+    level: w.duration ? `${w.duration} Days` : 'Intensive',
+    price: 'Free',
+    date: 'Upcoming',
+    img: idx === 0 ? '/static/workshop1.jpg' : (idx === 1 ? '/static/workshop2.jpg' : 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=400')
+  })) : [
+    { id: 1, title: 'Python for Data Analysis', instructor: 'Dr. Sarah Chen', level: 'Intermediate', price: 'Free', date: 'Oct 15', img: '/static/workshop1.png' },
+    { id: 2, title: 'Microcontroller Programming', instructor: 'Kevin Miller', level: 'Beginner', price: 'Free', date: 'Oct 18', img: '/static/workshop2.png' },
   ];
 
   return (
@@ -38,23 +46,12 @@ export const LandingPage = ({ onNavigate }) => {
           </div>
           <div className="relative group perspective-1000 hidden md:block">
             <div className="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl transition-transform duration-700 hover:rotate-y-12">
-               <img 
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200" 
-                alt="Students collaborating" 
+              <img
+                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200"
+                alt="Students collaborating"
                 className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
               />
               <div className="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
-            </div>
-            {/* Floating Card */}
-            <div className="absolute -bottom-10 -left-10 glass-card p-8 max-w-xs shadow-2xl fade-in hidden lg:block">
-               <div className="flex gap-1 mb-4">
-                 {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-accent text-accent" />)}
-               </div>
-               <p className="text-sm font-medium leading-relaxed mb-4 italic">"The most professional learning experience I've had in technical academics."</p>
-               <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-muted"></div>
-                 <span className="text-xs font-bold uppercase tracking-widest">Jameson K.</span>
-               </div>
             </div>
           </div>
         </div>
@@ -92,12 +89,13 @@ export const LandingPage = ({ onNavigate }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {workshops.map(w => (
+            {displayWorkshops.map(w => (
               <Card key={w.id} className="group hover:shadow-2xl transition-all duration-500 border-none bg-background p-0 overflow-hidden rounded-[2rem]">
                 <div className="aspect-[16/10] bg-muted relative overflow-hidden">
-                   <div className="absolute top-4 left-4 z-10">
-                     <span className="bg-white/90 backdrop-blur-md text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">{w.level}</span>
-                   </div>
+                  <img src={w.img} alt={w.title} className="w-full h-full object-cover" />
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="bg-white/90 backdrop-blur-md text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">{w.level}</span>
+                  </div>
                 </div>
                 <div className="p-8">
                   <span className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] mb-3 block">{w.date}</span>

@@ -1,31 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, CheckCircle, ArrowLeft, Share2, Heart, Users, Shield } from 'lucide-react';
 import { Button, Card } from '../components/ui/Base';
 
 export const WorkshopDetailPage = ({ id, onNavigate }) => {
-  const workshop = {
-    title: 'Advanced Neural Networks and Deep Learning',
-    instructor: {
-      name: 'Dr. Sarah Chen',
-      role: 'Head of AI, TechCorp',
-      bio: 'Over 15 years of experience in machine learning and neural architecture search. Former research lead at Stanford.',
-      img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200'
-    },
-    date: 'October 15, 2026',
-    time: '10:00 AM - 04:00 PM',
-    price: 'Free',
-    seats: 45,
-    enrolled: 33,
-    description: 'A comprehensive session covering the mathematical foundations and practical implementations of modern neural networks. This workshop provides a structured environment for students to master Transformers, CNNs, and Generative AI.',
-    agenda: [
-      { time: '10:00 AM', event: 'Introduction & Basic Concepts' },
-      { time: '11:30 AM', event: 'Deep Dive into Network Architectures' },
-      { time: '01:00 PM', event: 'Lunch Break & Networking' },
-      { time: '02:00 PM', event: 'Hands-on Coding & Implementation' },
-      { time: '03:30 PM', event: 'Q&A and Certification Details' },
-    ],
-    prerequisites: ['Basic Python proficiency', 'Understand Linear Algebra', 'Familiarity with Calculus'],
-  };
+  const [workshop, setWorkshop] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/workshop/api/workshop/${id}/`)
+      .then(res => res.json())
+      .then(data => {
+        setWorkshop(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
+
+  if (loading) return (
+    <div className="pt-40 text-center font-serif italic text-secondary min-h-screen">
+      Loading workshop sanctuary details...
+    </div>
+  );
+
+  if (!workshop || workshop.error) return (
+    <div className="pt-40 text-center min-h-screen">
+      <h2 className="font-serif text-3xl mb-4">Workshop not found</h2>
+      <Button onClick={() => onNavigate('/workshops')}>Return to Catalog</Button>
+    </div>
+  );
 
   return (
     <div className="bg-[#FAF9F7] min-h-screen">
@@ -38,7 +40,7 @@ export const WorkshopDetailPage = ({ id, onNavigate }) => {
            
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-end">
              <div className="fade-in">
-                <span className="bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full mb-8 inline-block">Advanced Certification</span>
+                <span className="bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full mb-8 inline-block">FOSSEE Certified</span>
                 <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 tracking-tight">{workshop.title}</h1>
                 
                 <div className="flex flex-wrap gap-10 items-center">
@@ -66,9 +68,9 @@ export const WorkshopDetailPage = ({ id, onNavigate }) => {
                 </div>
              </div>
              
-             <div className="hidden lg:block">
-                <div className="aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl relative group">
-                  <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover grayscale-[0.2] transition-transform duration-700 group-hover:scale-110" alt="Workshop hall" />
+             <div className="hidden lg:block relative group">
+                <div className="aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl">
+                   <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover grayscale-[0.2]" alt="Workshop atmosphere" />
                 </div>
              </div>
            </div>
@@ -78,7 +80,6 @@ export const WorkshopDetailPage = ({ id, onNavigate }) => {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20">
-           {/* Details */}
            <div className="lg:col-span-2">
               <div className="mb-20">
                 <h2 className="font-serif text-3xl mb-8 border-b border-black/5 pb-8">Course Overview</h2>
@@ -88,7 +89,7 @@ export const WorkshopDetailPage = ({ id, onNavigate }) => {
               </div>
 
               <div className="mb-20">
-                <h2 className="font-serif text-3xl mb-10 border-b border-black/5 pb-8">Workshop Agenda</h2>
+                <h2 className="font-serif text-3xl mb-10 border-b border-black/5 pb-8">Syllabus & Agenda</h2>
                 <div className="space-y-0">
                   {workshop.agenda.map((item, idx) => (
                     <div key={idx} className="flex gap-10 items-start py-8 group transition-all">
@@ -104,7 +105,7 @@ export const WorkshopDetailPage = ({ id, onNavigate }) => {
 
               <div className="mb-20">
                 <div className="glass-card p-12 bg-white">
-                   <h2 className="font-serif text-3xl mb-8">What You'll Need</h2>
+                   <h2 className="font-serif text-3xl mb-8">Preparation</h2>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {workshop.prerequisites.map((p, idx) => (
                         <div key={idx} className="flex gap-4 items-center">
@@ -120,24 +121,24 @@ export const WorkshopDetailPage = ({ id, onNavigate }) => {
            {/* Sidebar */}
            <div className="lg:col-span-1">
               <div className="sticky top-32">
-                 <div className="glass-card p-8 bg-white shadow-2xl overflow-hidden relative border-none">
+                 <div className="glass-card p-8 bg-white shadow-2xl relative border-none">
                     <div className="flex justify-between items-center mb-8">
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Fee</span>
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Course Fee</span>
                        <span className="text-2xl font-serif italic text-accent">{workshop.price}</span>
                     </div>
 
                     <div className="space-y-6 mb-10">
                        <div className="flex justify-between items-center text-xs pb-4 border-b border-black/5">
-                          <span className="text-secondary flex items-center gap-2 font-medium"><Users className="w-3.5 h-3.5" /> Registered Students</span>
+                          <span className="text-secondary flex items-center gap-2 font-medium"><Users className="w-3.5 h-3.5" /> Enrolled Participants</span>
                           <span className="font-bold">{workshop.enrolled}</span>
                        </div>
                        <div className="flex justify-between items-center text-xs pb-4 border-b border-black/5">
-                          <span className="text-secondary flex items-center gap-2 font-medium"><Shield className="w-3.5 h-3.5" /> Seats Remaining</span>
-                          <span className="font-bold text-accent">{workshop.seats - workshop.enrolled}</span>
+                          <span className="text-secondary flex items-center gap-2 font-medium"><Shield className="w-3.5 h-3.5" /> Total Capacity</span>
+                          <span className="font-bold text-accent">{workshop.seats}</span>
                        </div>
                     </div>
 
-                    <Button className="w-full py-5 mb-4 shadow-xl shadow-primary/10">Register for Workshop</Button>
+                    <Button className="w-full py-5 mb-4 shadow-xl shadow-primary/10">Register My Interest</Button>
                     <button className="w-full py-4 text-[10px] font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors flex items-center justify-center gap-2 border border-black/5 rounded-full mt-4">
                       <Heart className="w-3.5 h-3.5" /> Save Workshop
                     </button>

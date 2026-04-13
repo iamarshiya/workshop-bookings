@@ -1,140 +1,185 @@
 {% extends 'workshop_app/base.html' %}
 
-{% block title %} Statistics {% endblock %}
+{% block title %} Insights {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-3">
-            <form method="GET">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h3><u>Filters</u></h3>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{% url 'statistics_app:public' %}" class="btn btn-outline-info">
-                                    <i class="fa fa-times"></i>&nbsp;Clear
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div>From date: {{form.from_date}}</div>
-                        <div>To date: {{form.to_date}}</div>
-                        <div>Workshop: {{form.workshop_type}}</div>
-                        <div>State: {{form.state}}</div>
-                        <div>{{form.sort.help_text}}: {{form.sort}}</div>
-                        {% if request.user.is_authenticated %}
-                        <div>{{form.show_workshops.help_text}}: {{form.show_workshops}}</div>
-                        {% endif %}
-                        <br>
-                        <div class="row justify-content-center">
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-eye"></i>&nbsp;View
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-info" name="download" value="download">
-                                    <i class="fa fa-download"></i>&nbsp;Download
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="col">
-            <div class="row">
-                <div class="col-md-6">
-                    {% include "statistics_app/paginator.html" %}
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-info" id="state_graph">
-                        <i class="fa fa-bar-chart"></i>&nbsp;State chart
-                    </button>
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-info" id="type_graph">
-                        <i class="fa fa-bar-chart"></i>&nbsp;Workshops chart
-                    </button>
-                </div>
+<div class="dashboard-wrapper" style="display: flex; gap: 32px; margin-top: 20px;">
+    <!-- Sidebar Filters -->
+    <aside class="glass-card" style="width: 320px; height: fit-content; sticky: top; top: 100px; padding: 24px;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+            <span>🔍</span> Filters
+        </h3>
+        <form method="GET">
+            <div class="filter-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">From Date</label>
+                {{form.from_date}}
             </div>
-            <table class="table table-responsive-sm">
+            <div class="filter-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">To Date</label>
+                {{form.to_date}}
+            </div>
+            <div class="filter-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Workshop Type</label>
+                {{form.workshop_type}}
+            </div>
+            <div class="filter-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">State</label>
+                {{form.state}}
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px;">
+                <button type="submit" class="btn-primary" style="width: 100%;">Apply</button>
+                <a href="{% url 'statistics_app:public' %}" class="btn-primary" style="background: rgba(255,255,255,0.05) !important; color: white !important; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center;">Clear</a>
+            </div>
+            <button type="submit" name="download" value="download" class="btn-primary" style="width: 100%; margin-top: 12px; background: var(--accent) !important;">
+                📥 Download CSV
+            </button>
+        </form>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+            <div>
+                <h2 style="font-size: 2rem; font-weight: 800;">Workshop Analytics</h2>
+                <p style="color: var(--text-muted);">Real-time distribution of FOSSEE workshops across India.</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-primary" id="state_graph" style="background: rgba(99, 102, 241, 0.15) !important; border: 1px solid var(--primary) !important;">
+                    📊 State Distribution
+                </button>
+                <button class="btn-primary" id="type_graph" style="background: rgba(236, 72, 153, 0.15) !important; border: 1px solid var(--secondary) !important;">
+                    📈 Type Distribution
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
                 <thead>
                     <tr>
-                        <th>Sr No.</th>
-                        <th>Coordinator Name</th>
-                        <th>Institute Name</th>
-                        <th>Instructor Name</th>
-                        <th>Workshop Name</th>
-                        <th>Workshop Date</th>
+                        <th>Sr.</th>
+                        <th>Coordinator</th>
+                        <th>Institute</th>
+                        <th>Instructor</th>
+                        <th>Workshop</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
-                {% csrf_token %}
-                {% for workshop in objects %}
-                    <tbody>
-                        <tr>
-                            <td>{{ forloop.counter0|add:objects.start_index}}</td>
-                            <td>{{ workshop.coordinator.get_full_name | capfirst }}</td>
-                            <td>{{ workshop.coordinator.profile.institute | capfirst }}</td>
-                            <td>{{ workshop.instructor.get_full_name | capfirst }}</td>
-                            <td>{{ workshop.workshop_type.name }}</td>
-                            <td>{{ workshop.date | date}}</td>
-                        </tr>
-                    </tbody>
-                {% endfor %}
+                <tbody>
+                    {% for workshop in objects %}
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-muted);">{{ forloop.counter0|add:objects.start_index}}</td>
+                        <td>{{ workshop.coordinator.get_full_name | capfirst }}</td>
+                        <td style="color: var(--text-muted); font-size: 0.9rem;">{{ workshop.coordinator.profile.institute | capfirst }}</td>
+                        <td>{{ workshop.instructor.get_full_name | capfirst }}</td>
+                        <td>
+                            <span style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                                {{ workshop.workshop_type.name }}
+                            </span>
+                        </td>
+                        <td>{{ workshop.date | date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">No workshops found for the selected filters.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
+        </div>
+
+        <div style="margin-top: 24px;">
             {% include "statistics_app/paginator.html" %}
         </div>
+    </main>
+</div>
+
+<!-- Visualization Modal -->
+<div id="dialog" title="Analytics View" style="display:none;">
+    <div class="glass-card" style="padding: 20px; margin-top: 10px;">
+        <canvas id="myChart"></canvas>
     </div>
 </div>
 
-<!-- The Modal -->
-<div id="dialog" title="Workshops Statistics">
-    <canvas id="myChart"></canvas>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="text/javascript">
     var state_labels = {{ws_states|safe}};
     var state_data = {{ws_count|safe}};
     var type_labels = {{ws_type|safe}};
     var type_data = {{ws_type_count|safe}};
     var chart;
+
     $("#state_graph").on("click", function() {
-        show_graph(state_labels, state_data, "State wise workshops");
+        show_graph(state_labels, state_data, "State Distribution", '#6366f1');
     });
     $("#type_graph").on("click", function() {
-        show_graph(type_labels, type_data, "Type wise workshops");
+        show_graph(type_labels, type_data, "Workshop Types", '#ec4899');
     });
 
-    function show_graph(labels, data, graph_name, chart_name) {
+    function show_graph(labels, data, graph_name, color) {
         var ctx = document.getElementById('myChart').getContext('2d');
         if(chart) chart.destroy();
+        
         chart = new Chart(ctx, {
-            // The type of chart we want to create
             type: 'bar',
-
-            // The data for our dataset
             data: {
                 labels: labels,
                 datasets: [{
                     data: data,
                     label: graph_name,
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 1,
+                    borderRadius: 8
                 }]
             },
-            // Configuration options go here
-            options: {}
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
         });
+        
         $("#dialog").dialog({
-            width: 900,
-            height: 500
+            width: 800,
+            height: 500,
+            modal: true,
+            resizable: false
         });
     }
 </script>
 
+<style>
+    .ui-dialog {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid var(--border-glass) !important;
+        border-radius: 20px !important;
+        padding: 20px !important;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.6) !important;
+    }
+    .ui-dialog-titlebar {
+        background: transparent !important;
+        border: none !important;
+        color: white !important;
+        font-weight: 800 !important;
+    }
+    .ui-widget-overlay {
+        background: rgba(2, 6, 23, 0.8) !important;
+        backdrop-filter: blur(4px) !important;
+    }
+</style>
 {% endblock %}

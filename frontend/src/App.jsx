@@ -6,10 +6,14 @@ import { WorkshopListingPage } from './pages/Workshops';
 import { WorkshopDetailPage } from './pages/WorkshopDetail';
 import { StudentDashboard } from './pages/Dashboard';
 import { AdminDashboard } from './pages/Admin';
+import { StatisticsPage } from './pages/Stats';
 import { LoginPage, SignupPage, ForgotPasswordPage } from './pages/Auth';
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [user, setUser] = useState(window.userData || null);
+  const [workshops, setWorkshops] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Sync state with browser navigation
   useEffect(() => {
@@ -18,31 +22,68 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // Fetch Workshops
+  useEffect(() => {
+    fetch('/workshop/api/workshops/')
+      .then(res => res.json())
+      .then(data => {
+        setWorkshops(data.workshops || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Fetch error:', err);
+        setLoading(false);
+      });
+  }, []);
+
   const navigate = (path) => {
+    if (path.startsWith('/workshop/login') || path.startsWith('/workshop/logout')) {
+      window.location.href = path; // Standard Django redirect
+      return;
+    }
     window.history.pushState({}, '', path);
     setCurrentPath(path);
     window.scrollTo(0, 0);
   };
 
   const renderPage = () => {
+    if (loading) return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse flex flex-col items-center">
+           <div className="w-12 h-12 bg-accent rounded-full mb-4"></div>
+           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Loading FOSSEE Portal</p>
+        </div>
+      </div>
+    );
+
     // Basic Routing Logic
-    if (currentPath === '/') return <LandingPage onNavigate={navigate} />;
-    if (currentPath === '/workshops') return <WorkshopListingPage onNavigate={navigate} />;
+    if (currentPath === '/' || currentPath === '/workshop/') return <LandingPage onNavigate={navigate} workshops={workshops} />;
+    
+    if (currentPath === '/workshops' || currentPath === '/workshop/types/') 
+      return <WorkshopListingPage onNavigate={navigate} workshops={workshops} />;
+    
     if (currentPath.startsWith('/workshop/')) {
-      const id = currentPath.split('/')[2];
-      return <WorkshopDetailPage id={id} onNavigate={navigate} />;
+      const parts = currentPath.split('/');
+      const id = parts[parts.length - 2] || parts[parts.length - 1]; // Handle trailing slash
+      if (!isNaN(id)) {
+        return <WorkshopDetailPage id={id} onNavigate={navigate} />;
+      }
     }
-    if (currentPath === '/dashboard') return <StudentDashboard onNavigate={navigate} />;
+    
+    if (currentPath === '/dashboard' || currentPath === '/workshop/status_coordinator/' || currentPath === '/workshop/status_instructor/') 
+      return <StudentDashboard onNavigate={navigate} user={user} />;
+    
+    if (currentPath === '/stats' || currentPath === '/statistics/public/') return <StatisticsPage />;
+
     if (currentPath === '/admin') return <AdminDashboard onNavigate={navigate} />;
-    if (currentPath === '/login') return <LoginPage onNavigate={navigate} />;
-    if (currentPath === '/signup') return <SignupPage onNavigate={navigate} />;
+    if (currentPath === '/login' || currentPath === '/workshop/login/') return <LoginPage onNavigate={navigate} />;
+    if (currentPath === '/signup' || currentPath === '/workshop/register/') return <SignupPage onNavigate={navigate} />;
     if (currentPath === '/forgot-password') return <ForgotPasswordPage onNavigate={navigate} />;
     
-    return <LandingPage onNavigate={navigate} />;
+    return <LandingPage onNavigate={navigate} workshops={workshops} />;
   };
 
-  // Check if we are on an Auth page to hide Navbar/Footer
-  const isAuthPage = ['/login', '/signup', '/forgot-password'].includes(currentPath);
+  const isAuthPage = ['/login', '/signup', '/forgot-password', '/workshop/login/', '/workshop/register/'].includes(currentPath);
 
   return (
     <HelmetProvider>
@@ -52,7 +93,7 @@ function App() {
           <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
         </Helmet>
 
-        {!isAuthPage && <Navbar onNavigate={navigate} currentPath={currentPath} />}
+        {!isAuthPage && <Navbar onNavigate={navigate} currentPath={currentPath} user={user} />}
         
         <main className="flex-grow">
           {renderPage()}

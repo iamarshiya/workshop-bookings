@@ -8,9 +8,6 @@ from cms.models import Page
 
 
 def index(request):
-    page = Page.objects.filter(title=settings.HOME_PAGE_TITLE)
-    if page.exists():
-        redirect_url = reverse("cms:home", args=[page.first().permalink])
-    else:
-        redirect_url = reverse("workshop_app:index")
-    return redirect(redirect_url)
+    """Serve the React Frontend for the root URL"""
+    from workshop_app.views import index as app_index
+    return app_index(request)

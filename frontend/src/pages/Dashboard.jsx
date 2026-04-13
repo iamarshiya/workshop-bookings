@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Calendar, Star, Bell, Download, Award, Clock, ArrowUpRight, Search } from 'lucide-react';
 import { Card, Button } from '../components/ui/Base';
 
-export const StudentDashboard = ({ user = { name: 'Julian' } }) => {
-  const registered = [
-    { id: 1, title: 'Advanced Neural Networks', instructor: 'Dr. Sarah Chen', date: 'Oct 15', status: 'Upcoming' },
-    { id: 2, title: 'Embedded Systems Workshop', instructor: 'Kevin Miller', date: 'Sep 28', status: 'Completed', cert: true },
+export const StudentDashboard = ({ user, onNavigate }) => {
+  const [stats, setStats] = useState({
+    registered: 0,
+    completed: 0,
+    saved: 0,
+    upcoming: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Default values if user is not authenticated for demo
+  const displayName = user?.full_name || 'Student';
+
+  useEffect(() => {
+    fetch('/workshop/api/stats/')
+      .then(res => res.json())
+      .then(data => {
+        setStats(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const registeredWorkshops = [
+    { id: 1, title: 'Sample Registered Workshop', instructor: 'FOSSEE Expert', date: 'TBD', status: 'Upcoming' },
   ];
 
   return (
@@ -15,17 +35,19 @@ export const StudentDashboard = ({ user = { name: 'Julian' } }) => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 mb-20 fade-in">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent mb-4 block">Student Portal</span>
-            <h1 className="font-serif text-5xl md:text-6xl mb-4">Welcome back, <br /><span className="italic">{user.name}.</span></h1>
+            <h1 className="font-serif text-5xl md:text-6xl mb-4">Welcome back, <br /><span className="italic">{displayName}.</span></h1>
             <p className="text-secondary font-medium">Your workshop progress and upcoming learning activities.</p>
           </div>
           <div className="flex gap-4">
-             <button className="p-4 bg-white rounded-full relative group transition-all hover:bg-primary hover:text-white shadow-sm">
+             <button className="p-4 bg-white rounded-full relative group shadow-sm">
                 <Bell className="w-5 h-5 flex-shrink-0" />
-                <span className="absolute top-4 right-4 w-2 h-2 bg-accent rounded-full border-2 border-white group-hover:border-primary"></span>
+                <span className="absolute top-4 right-4 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
              </button>
-             <button className="flex items-center gap-4 bg-white px-6 py-4 rounded-full shadow-sm hover:shadow-md transition-all">
-                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-[10px] font-bold text-accent">JK</div>
-                <span className="text-xs font-bold uppercase tracking-widest text-primary">Julian Kaspar</span>
+             <button className="flex items-center gap-4 bg-white px-6 py-4 rounded-full shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-[10px] font-bold text-accent">
+                   {displayName.charAt(0)}
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest text-primary">{displayName}</span>
              </button>
           </div>
         </div>
@@ -33,10 +55,10 @@ export const StudentDashboard = ({ user = { name: 'Julian' } }) => {
         {/* Top Cards - Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
            {[
-             { label: 'Registered Workshops', val: '12', icon: BookOpen },
-             { label: 'Completed Courses', val: '08', icon: Award },
-             { label: 'Saved Workshops', val: '24', icon: Star },
-             { label: 'Upcoming Sessions', val: '02', icon: Calendar },
+             { label: 'Registered Workshops', val: stats.registered, icon: BookOpen },
+             { label: 'Completed Courses', val: stats.completed, icon: Award },
+             { label: 'Saved Workshops', val: stats.saved, icon: Star },
+             { label: 'Upcoming Sessions', val: stats.upcoming, icon: Calendar },
            ].map(stat => (
              <div key={stat.label} className="bg-white p-8 rounded-3xl shadow-sm border border-black/5 hover:translate-y-[-4px] transition-transform">
                 <stat.icon className="w-5 h-5 text-accent mb-6" />
@@ -55,27 +77,26 @@ export const StudentDashboard = ({ user = { name: 'Julian' } }) => {
                 </div>
                 
                 <div className="space-y-6">
-                   {registered.map(item => (
-                     <div key={item.id} className="glass-card bg-white grid grid-cols-1 md:grid-cols-4 gap-8 items-center p-8 transition-all hover:shadow-xl border-none">
+                   {registeredWorkshops.map(item => (
+                     <div key={item.id} className="glass-card bg-white grid grid-cols-1 md:grid-cols-4 gap-8 items-center p-8 border-none">
                         <div className="col-span-2">
                            <h4 className="font-serif text-xl mb-1">{item.title}</h4>
                            <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">{item.instructor}</p>
                         </div>
                         <div className="text-center">
-                           <span className="text-xs font-bold text-primary font-sans block">{item.date}</span>
+                           <span className="text-xs font-bold text-primary block">{item.date}</span>
                            <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">October</span>
                         </div>
                         <div className="text-right">
-                           {item.status === 'Upcoming' ? (
-                             <Button className="px-6 py-2 text-[10px] uppercase tracking-widest">Join Session</Button>
-                           ) : (
-                             <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-accent mx-auto md:ml-auto">
-                                <Download className="w-3.5 h-3.5" /> Certificate
-                             </button>
-                           )}
+                           <Button className="px-6 py-2 text-[10px] uppercase tracking-widest">Join Session</Button>
                         </div>
                      </div>
                    ))}
+                   {stats.registered === 0 && (
+                      <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-muted font-serif italic text-secondary">
+                        No workshops registered yet. Explore the catalog to begin.
+                      </div>
+                   )}
                 </div>
              </div>
            </div>
@@ -85,25 +106,18 @@ export const StudentDashboard = ({ user = { name: 'Julian' } }) => {
               <div className="glass-card bg-white p-10 border-none shadow-sm">
                  <h2 className="font-serif text-2xl mb-8">System <span className="italic">Updates</span></h2>
                  <div className="space-y-8">
-                    {[
-                      { msg: 'System maintenance scheduled for Oct 14.', date: '2h ago' },
-                      { msg: 'New Data Science curriculum available for review.', date: '1d ago' },
-                      { msg: 'Successful enrollment in Advanced Neural Networks.', date: '3d ago' },
-                    ].map((memo, idx) => (
-                      <div key={idx} className="flex gap-4 items-start pb-8 border-b border-black/5 last:border-none last:pb-0">
-                         <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0"></div>
-                         <div>
-                            <p className="text-sm font-medium leading-relaxed text-secondary mb-2">{memo.msg}</p>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">{memo.date}</span>
-                         </div>
-                      </div>
-                    ))}
+                    <div className="flex gap-4 items-start">
+                       <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0"></div>
+                       <div>
+                          <p className="text-sm font-medium leading-relaxed text-secondary">Welcome to the modernized FOSSEE Portal.</p>
+                       </div>
+                    </div>
                  </div>
               </div>
 
-              <div className="bg-[#EAE8E4] p-10 rounded-[2.5rem] relative group cursor-pointer overflow-hidden">
+              <div className="bg-[#EAE8E4] p-10 rounded-[2.5rem] relative group cursor-pointer overflow-hidden" onClick={() => onNavigate('/workshops')}>
                  <h2 className="font-serif text-2xl mb-4">Discover New <br />Skills.</h2>
-                 <p className="text-secondary text-xs font-bold uppercase tracking-widest mb-8">Browse 45 New Workshops</p>
+                 <p className="text-secondary text-xs font-bold uppercase tracking-widest mb-8">Browse All Workshops</p>
                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center transition-all group-hover:bg-primary group-hover:text-white">
                     <ArrowUpRight className="w-5 h-5" />
                  </div>

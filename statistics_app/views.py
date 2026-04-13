@@ -11,7 +11,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 # Local Imports
 from workshop_app.models import (
@@ -129,3 +129,32 @@ def team_stats(request, team_id=None):
         {'team_labels': team_labels, "ws_count": ws_count, 'all_teams': teams,
          'team_id': team.id}
     )
+
+
+def public_stats_api(request):
+    """API endpoint for public workshop statistics and analytics"""
+    # Fetch all confirmed workshops
+    workshops = Workshop.objects.filter(status=1).order_by('-date')
+    
+    # Get stats using existing manager methods
+    ws_states, ws_count = Workshop.objects.get_workshops_by_state(workshops)
+    ws_type, ws_type_count = Workshop.objects.get_workshops_by_type(workshops)
+    
+    # Prepare table data
+    data = []
+    for w in workshops[:10]: # Limit to 10 for performance
+        data.append({
+            'coordinator': w.coordinator.get_full_name(),
+            'institute': w.coordinator.profile.institute if hasattr(w.coordinator, 'profile') else 'N/A',
+            'instructor': w.instructor.get_full_name() if w.instructor else 'TBD',
+            'type': w.workshop_type.name,
+            'date': w.date.strftime('%b %d, %Y')
+        })
+        
+    return JsonResponse({
+        'table_data': data,
+        'charts': {
+            'states': { 'labels': ws_states, 'values': ws_count },
+            'types': { 'labels': ws_type, 'values': ws_type_count }
+        }
+    })

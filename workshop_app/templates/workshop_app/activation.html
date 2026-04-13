@@ -1,76 +1,56 @@
 {% extends 'workshop_app/base.html' %}
 
-{% block title %}
-    Awaiting activation
-{% endblock %}
+{% block title %} Account Activation {% endblock %}
 
 {% block header %}
-    <nav class="navbar navbar-default navbar-dark bg-dark">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand text-white" href="/">
-                    FOSSEE Workshops
-                </a>
-            </div>
-            <ul class="nav navbar-nav navbar-right">
-                {% if request.user.profile.is_email_verified %}
-                    <li><a href="{% url 'workshop_app:view_profile' %}"><span class="glyphicon glyphicon-user"></span>
-                        Profile</a></li>
-
-                    <li><a href="{% url 'workshop_app:logout' %}"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
-{% endblock %}
-
-{% block extra %}
-
+    <!-- Inherit header from base.html -->
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}
-    {% if status == '2' %}
-        <div class="container">
-            <div class="jumbotron">
-                <p> Your email is already verified, Click
-                    <a href="{% url 'workshop_app:index' %}">here</a>
-                </p>
-            </div>
-        </div>
-    {% elif status == '1' %}
-        <script type="text/javascript">
-            window.setTimeout(function () {
-                location.href = "{% url 'workshop_app:register' %}"
-            }, 3000);
-        </script>
-        <div class="container">
-            <div class="jumbotron">
-                <p> Your activation has expired please register again</p>
-            </div>
-        </div>
-    {% elif status == '0' %}
-        <div class="container">
-            <div class="jumbotron">
-                <p> Your account has been activated. Click
-                    <a href="{% url 'workshop_app:index' %}">here</a>
-                </p>
-            </div>
-        </div>
-    {% else %}
-        <script type="text/javascript">
-            window.setTimeout(function () {
-                location.href = "{% url 'workshop_app:logout' %}"
-            }, 5000);
-        </script>
+<div style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
+    <div class="glass-card" style="width: 100%; max-width: 550px; text-align: center; padding: 48px;">
+        
+        {% if status == '2' %}
+            <div style="font-size: 4rem; margin-bottom: 24px;">✅</div>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 12px;">Already Verified</h2>
+            <p style="color: var(--text-muted); margin-bottom: 40px;">Your email address has already been verified. You're all set!</p>
+            <a href="{% url 'workshop_app:index' %}" class="btn-primary" style="width: 100%; text-decoration: none;">Go to Homepage</a>
 
-        <div class="container">
-            <div class="jumbotron">
-                <h1>Activation Awaiting</h1>
-                <p>The Activation Link has been sent to your email. The link expires in <strong>24hours</strong> from
-                    the date of registration. You will be logged out automatically
-                </p>
+        {% elif status == '1' %}
+            <div style="font-size: 4rem; margin-bottom: 24px;">⏰</div>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 12px;">Link Expired</h2>
+            <p style="color: var(--text-muted); margin-bottom: 40px;">Your activation link has expired. Redirecting you to register again...</p>
+            <script type="text/javascript">
+                window.setTimeout(function () {
+                    location.href = "{% url 'workshop_app:register' %}"
+                }, 3000);
+            </script>
+            <a href="{% url 'workshop_app:register' %}" class="btn-primary" style="width: 100%; text-decoration: none;">Register Now</a>
+
+        {% elif status == '0' %}
+            <div style="font-size: 4rem; margin-bottom: 24px;">🎊</div>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 12px;">Success!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 40px;">Your account is now active. Welcome to the FOSSEE community!</p>
+            <a href="{% url 'workshop_app:index' %}" class="btn-primary" style="width: 100%; text-decoration: none;">Explore Workshops</a>
+
+        {% else %}
+            <div style="font-size: 4rem; margin-bottom: 24px;">📬</div>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 12px;">Verify your Email</h2>
+            <p style="color: var(--text-muted); margin-bottom: 32px; line-height: 1.6;">
+                An activation link has been sent to your email. Please click the link within <strong>24 hours</strong> to activate your account.
+            </p>
+            <div class="alert glass" style="margin-bottom: 40px; border-radius: 12px; font-size: 0.9rem;">
+                Redirecting you to login page in 5 seconds...
             </div>
-        </div>
-    {% endif %}
+            <script type="text/javascript">
+                window.setTimeout(function () {
+                    location.href = "{% url 'workshop_app:logout' %}"
+                }, 5000);
+            </script>
+            <a href="{% url 'workshop_app:logout' %}" class="btn-primary" style="width: 100%; text-decoration: none; background: rgba(255,255,255,0.05) !important;">Logout</a>
+        {% endif %}
+
+    </div>
+</div>
 {% endblock %}

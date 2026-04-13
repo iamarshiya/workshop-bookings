@@ -1,0 +1,44 @@
+{% extends 'workshop_app/base.html' %}
+{% load static %}
+
+{% block title %} Welcome {% endblock %}
+
+{% block header %}
+<!-- React App handles its own header for the homepage -->
+{% endblock %}
+
+{% block mobile_nav %}
+<!-- React App handles its own mobile nav for the homepage -->
+{% endblock %}
+
+{% block footer %}
+<!-- React App handles its own footer for the homepage -->
+{% endblock %}
+
+{% block content %}
+<div id="root"></div>
+
+<!-- Safe JSON data passing -->
+{% if user_json %}
+    {{ user_json|json_script:"user_data_payload" }}
+{% else %}
+    <script id="user_data_payload" type="application/json">null</script>
+{% endif %}
+
+<script>
+    (function() {
+        const dataEl = document.getElementById('user_data_payload');
+        if (dataEl) {
+            try {
+                window.userData = JSON.parse(dataEl.textContent);
+            } catch(e) {
+                window.userData = null;
+            }
+        }
+    })();
+</script>
+
+<!-- Load Assets from React Build -->
+<script type="module" crossorigin src="{% static 'assets/index-Dq2fwGFt.js' %}"></script>
+<link rel="stylesheet" crossorigin href="{% static 'assets/index-8Ml__QrW.css' %}">
+{% endblock %}
